@@ -1,5 +1,6 @@
  import userModel from "../models/userModel.js";
  import { comparePassword, hashPassword } from "./../helpers/authHelper.js";
+ import JWT from "jsonwebtoken";
 
 
  export const registerController=async(req,res)=>{
@@ -58,4 +59,65 @@
         })
     }
  };
+
+ export const loginController=async(req,res)=>{
+       try {
+           const{email,password}=req.body;
+           if(!email||!password)
+           {
+            return res.status(404).send({
+                success:false,
+                message:"Invalid User or Password"
+            })
+           }
+           const user= await userModel.findOne({ email });
+           if(!user){
+            return res.status(404).send({
+                success:false,
+                message:"Email not registered"
+            })
+           }
+           const match=await comparePassword(password,user.password);
+           if(!match){
+            return res.status(200).send({
+                success:false,
+                message:"Invalid password"
+            })
+           }
+
+           //token
+          const token =await JWT.sign({_id:user._id},process.env.JWT_SECRETS,{expiresIn:"100d"});
+
+          res.status(200).send({
+            success:true,
+            message:"login successfully",
+            user:{
+                name:user.name,
+                email:user.email,
+                phone:user.phone,
+                address:user.address
+            },token
+          });
+
+
+       } catch (error) {
+        res.status(500).send({
+            success:false,
+            message:'error in login',
+            error
+        })
+       }
+ };
+
+
+ //testing of middleware by test controller
+
+export const testController= async(req,res)=>{
+    try {
+        res.send("protected route access given")
+    } catch (error) {
+        console.log(error);
+        res.send({ error });
+    }
+}
 
