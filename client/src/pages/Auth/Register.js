@@ -10,6 +10,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [answer, setAnswer] = useState("");
  
   const navigate=useNavigate();
   
@@ -17,8 +18,8 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
       try {
-        const res=await axios.post(`${process.env.REACT_APP_API}/api/v1/auth/register`,{name,email,password,phone,address});
-        console.log(res);
+        const res=await axios.post(`${process.env.REACT_APP_API}/api/v1/auth/register`,{name,email,password,phone,address,answer});
+       
         if(res.data.success)
         {
             toast.success(res.data.message);   
@@ -27,7 +28,7 @@ const Register = () => {
             
             toast.error(res.data.message);
             navigate("/login");
-            console.log(1);
+           
         }
       } catch (error) {
         console.log(error)
@@ -93,6 +94,17 @@ const Register = () => {
               className="form-control"
               id="exampleInputaddress"
               placeholder="Enter Your Address"
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <input
+              type="text"
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              className="form-control"
+              id="exampleInputanswer"
+              placeholder="Your best Friend Name"
               required
             />
           </div>
